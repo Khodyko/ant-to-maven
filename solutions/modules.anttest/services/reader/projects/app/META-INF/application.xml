@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE application PUBLIC '-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN' 'http://java.sun.com/dtd/application_1_3.dtd'>
+
+<application>
+    <display-name>@{service.ejb.name}</display-name>
+    <description>@{service.description}</description>
+    <module>
+        <web>
+            <web-uri>@{service.war.file}</web-uri>
+            <context-root>@{service.web.context}</context-root>
+        </web>
+    </module>
+    <module><ejb>modules_anttest_reader_ejb.jar</ejb></module>
+</application>

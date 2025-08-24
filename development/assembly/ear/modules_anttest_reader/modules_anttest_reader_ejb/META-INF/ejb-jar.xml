@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN" "http://java.sun.com/dtd/ejb-jar_2_0.dtd">
+
+<ejb-jar id="ejb-jar_RandomWordGenerator">
+
+   <description></description>
+   <display-name></display-name>
+
+   <enterprise-beans>
+
+      <session id="Session_RandomWordGenerator">
+         <description>RandomWordGenerator</description>
+         <ejb-name>RandomWordGenerator</ejb-name>
+
+         <home>modules.anttest.reader.ejb.RandomWordGeneratorHome</home>
+         <remote>modules.anttest.reader.ejb.RandomWordGeneratorRemote</remote>
+         <ejb-class>modules.anttest.reader.ejb.RandomWordGeneratorBean</ejb-class>
+
+         <session-type>Stateless</session-type>
+
+         <transaction-type>Container</transaction-type>
+
+         <env-entry>
+             <description>spool</description>
+             <env-entry-name>service.spool.dir</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{service.spool.dir}</env-entry-value>
+         </env-entry>
+
+         <env-entry>
+             <description>logger config</description>
+             <env-entry-name>logger.config.url</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{logger.config.url}</env-entry-value>
+         </env-entry>
+
+         <env-entry>
+             <description>logger interval</description>
+             <env-entry-name>logger.reload.interval</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>5000</env-entry-value>
+         </env-entry>
+
+         <env-entry>
+             <description>efilerules.digester.name</description>
+             <env-entry-name>efilerules.digester.name</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{efilerules.digester.name}</env-entry-value>
+         </env-entry>
+         <env-entry>
+             <description>efilerowtag.digester.name</description>
+             <env-entry-name>efilerowtag.digester.name</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{efilerowtag.digester.name}</env-entry-value>
+         </env-entry>
+
+         <env-entry>
+             <description>efilerules.storage.name</description>
+             <env-entry-name>efilerules.storage.name</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{efilerules.storage.name}</env-entry-value>
+         </env-entry>
+         <env-entry>
+             <description>efilerowtag.storage.name</description>
+             <env-entry-name>efilerowtag.storage.name</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{efilerowtag.storage.name}</env-entry-value>
+         </env-entry>
+
+      </session>
+
+   </enterprise-beans>
+
+</ejb-jar>

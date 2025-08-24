@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN" "http://java.sun.com/dtd/ejb-jar_2_0.dtd">
+
+<ejb-jar id="ejb-jar_@{service.ejb.name}">
+
+   <description></description>
+   <display-name></display-name>
+
+   <enterprise-beans>
+
+      <session id="Session_@{service.ejb.name}">
+         <description>@{service.description}</description>
+         <ejb-name>@{service.ejb.name}</ejb-name>
+
+         <home>@{ejb.home.class}</home>
+         <remote>@{ejb.remote.class}</remote>
+         <ejb-class>@{ejb.bean.class}</ejb-class>
+
+         <session-type>@{ejb.session.type}</session-type>
+
+         <transaction-type>@{ejb.transaction.type}</transaction-type>
+
+         <env-entry>
+             <description>logger config</description>
+             <env-entry-name>logger.config.url</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>@{logger.config.url}</env-entry-value>
+         </env-entry>
+
+         <env-entry>
+             <description>logger interval</description>
+             <env-entry-name>logger.reload.interval</env-entry-name>
+             <env-entry-type>java.lang.String</env-entry-type>
+             <env-entry-value>5000</env-entry-value>
+         </env-entry>
+
+      </session>
+
+   </enterprise-beans>
+
+</ejb-jar>

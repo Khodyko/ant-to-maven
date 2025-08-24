@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<project name="main.build" default="buildall" basedir=".">
+    <!-- Настройки, определяющие сборки проекта -->
+    <property file="common.properties"/>
+
+    <target name="buildall">
+        <mkdir dir="${build.ear.dir}"/>
+        <mkdir dir="${service.innerlib.dir}"/>
+        <antcall target="buildis"/>
+        <antcall target="make.set"/>
+        <antcall target="cleanall"/>
+    </target>
+
+    <target name="build1is">
+        <echo>
+            =======================================================================
+            Building Information Service ${is.name} ...
+        </echo>
+        <ant dir="${module.dir}/build/" target="${module.target}" />
+        <copy todir="${build.ear.dir}">
+            <fileset dir="${module.dir}/assembly/">
+                <include name="**/*.ear" />
+            </fileset>
+        </copy>
+        <echo>
+            Build of Information Service ${is.name} was completed successfully.
+            =======================================================================
+        </echo>
+    </target>
+
+    <target name="buildis">
+        <antcall target="build1is">
+            <param name="module.name" value="modules.anttest" />
+            <param name="module.dir" value="modules.anttest/services/reader" />
+            <param name="module.target" value="shared" />
+        </antcall>
+    </target>
+
+    <target name="make.set">
+
+    </target>
+
+    <target name="clean">
+        <delete dir="${is.dir}/assembly" />
+    </target>
+    
+
+    <target name="cleanall">
+        <antcall target="clean">
+            <param name="is.dir" value="modules.anttest/services/reader" />
+        </antcall>
+    </target>
+</project>

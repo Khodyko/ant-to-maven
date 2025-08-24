@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<project name="is.service" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+    <!-- Настройки, определяющие сборки проекта -->
+    <property file="../../../../common.properties" />
+    <property file="../config/service.properties" />
+    <property file="../config/build.properties" />
+
+
+<!--    <property name="ws.generate.programm" value="${common.src.dir}/wsgen.bat" />-->
+
+    <!-- Определяет путь к внешним библиотекам -->
+    <path id="outerlib.path">
+        <fileset dir="${service.outerlib.dir}">
+            <include name="*.jar" />
+            <include name="*.zip" />
+        </fileset>
+    </path>
+
+    <!-- Определяет путь к внутренним библиотекам -->
+    <path id="innerlib.path">
+        <fileset dir="${service.innerlib.dir}">
+            <include name="*.jar" />
+            <include name="*.zip" />
+        </fileset>
+    </path>
+
+    <!-- Определяет общий путь к библиотекам для компиляции -->
+    <path id="common.compile.path">
+        <path refid="innerlib.path" />
+        <path refid="outerlib.path" />
+    </path>
+
+    <!-- Инициализирует проект для компиляции и сборки -->
+    <target name="init">
+        <mkdir dir="${service.assembly.dir}" />
+        <mkdir dir="${service.outerlib.dir}" />
+        <mkdir dir="${service.innerlib.dir}" />
+    </target>
+
+    <!-- Инициализирует WEB-приложение -->
+    <target name="web.init" depends="init,web.check" if="web.present">
+        <mkdir dir="${service.assembly.web.dir}" />
+        <mkdir dir="${service.assembly.webinf.dir}" />
+        <mkdir dir="${service.assembly.webinf.lib.dir}" />
+        <mkdir dir="${service.assembly.webinf.classes.dir}" />
+    </target>
+
+    <!-- Инициализирует LIB-приложение -->
+    <target name="lib.init" depends="init,lib.check" if="lib.present">
+        <mkdir dir="${service.assembly.lib.dir}" />
+    </target>
+
+    <!-- Инициализирует EJB-приложение -->
+    <target name="ejb.init" depends="init,ejb.check" if="ejb.present">
+        <mkdir dir="${service.assembly.ejb.dir}" />
+    </target>
+
+    <!-- Инициализирует EJB-приложение -->
+    <target name="app.init" depends="init,app.check" if="app.present">
+        <mkdir dir="${service.assembly.app.dir}" />
+    </target>
+
+    <!-- Деинициализирует проект после выполнения компиляции/сборки -->
+    <target name="clean">
+        <delete dir="${service.assembly.lib.dir}" />
+        <delete dir="${service.assembly.ejb.dir}" />
+        <delete dir="${service.assembly.web.dir}" />
+        <delete dir="${service.assembly.app.dir}" />
+    </target>
+
+    <!-- Деинициализирует WEB-компонент -->
+    <target name="web.clean">
+        <delete dir="${service.assembly.web.dir}" />
+    </target>
+
+    <!-- Деинициализирует LIB-компонент -->
+    <target name="lib.clean">
+        <delete dir="${service.assembly.lib.dir}" />
+    </target>
+
+    <!-- Деинициализирует EJB-компонент -->
+    <target name="ejb.clean">
+        <delete dir="${service.assembly.ejb.dir}" />
+    </target>
+
+    <!-- Деинициализирует EAR-компонент -->
+    <target name="app.clean">
+        <delete dir="${service.assembly.app.dir}" />
+    </target>
+
+    <!-- Проверяет необходимость сборки EAR-компонента информационной услуги -->
+    <target name="app.check">
+        <available file="${service.app.metainf.dir}/application.xml" type="file" property="app.present" />
+    </target>
+
+    <!-- Проверяет необходимость сборки EJB-компонента информационной услуги -->
+    <target name="ejb.check">
+        <available file="${service.ejb.metainf.dir}/ejb-jar.xml" type="file" property="ejb.present" />
+    </target>
+
+    <!-- Проверяет необходимость сборки WEB-компонента информационной услуги -->
+    <target name="web.check">
+        <available file="${service.web.webinf.dir}/web.xml" type="file" property="web.present" />
+    </target>
+
+    <!-- Проверяет необходимость компиляции WEB-компонента информационной услуги -->
+    <target name="web.java.check">
+        <available file="${service.web.src.dir}" type="dir" property="web.java.present" />
+    </target>
+
+    <!-- Проверяет необходимость сборки LIB-компонента информационной услуги -->
+    <target name="lib.check">
+        <available file="${service.lib.src.dir}" type="dir" property="lib.present" />
+    </target>
+
+    <!-- Компилирует LIB-компонент -->
+    <target name="lib.compile" depends="lib.check,lib.init" if="lib.present">
+        <javac srcdir="${service.lib.src.dir}" destdir="${service.assembly.lib.dir}" debug="${service.compile.debug}" classpathref="common.compile.path" deprecation="${service.compile.deprecation}" encoding="Cp1251" />
+<!--        <rmic base="${service.assembly.lib.dir}" iiop="yes" includes="**/*Remote.class **/*Home.class">-->
+<!--            <classpath>-->
+<!--                <path refid="common.compile.path" />-->
+<!--                <pathelement path="${service.assembly.lib.dir}" />-->
+<!--                <fileset dir="${service.assembly.dir}">-->
+<!--                    <include name="*.jar" />-->
+<!--                    <include name="*.zip" />-->
+<!--                </fileset>-->
+<!--            </classpath>-->
+<!--        </rmic>-->
+    </target>
+
+    <!-- Компилирует WEB-компонент -->
+    <target name="web.compile" depends="web.java.check,web.init,lib.compile" if="web.java.present">
+        <javac srcdir="${service.web.src.dir}" destdir="${service.assembly.webinf.classes.dir}" debug="${service.compile.debug}" deprecation="${service.compile.deprecation}" encoding="Cp1251">
+            <classpath>
+                <path refid="common.compile.path" />
+                <pathelement path="${service.assembly.lib.dir}" />
+                <fileset dir="${service.assembly.dir}">
+                    <include name="*.jar" />
+                    <include name="*.zip" />
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Компилирует EJB-компонент -->
+    <target name="ejb.compile" depends="ejb.check,ejb.init,lib.compile" if="ejb.present">
+        <javac srcdir="${service.ejb.src.dir}" destdir="${service.assembly.ejb.dir}" debug="${service.compile.debug}" deprecation="${service.compile.deprecation}" encoding="Cp1251">
+            <classpath>
+                <path refid="common.compile.path" />
+                <pathelement path="${service.assembly.lib.dir}" />
+                <fileset dir="${service.assembly.dir}">
+                    <include name="*.jar" />
+                    <include name="*.zip" />
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Компилирует EAR-компонент -->
+    <target name="app.compile" depends="app.check,app.init,lib.compile,ejb.compile,web.compile" if="app.present">
+    </target>
+
+    <!-- Собирает WEB-компонент -->
+    <target name="web.build" depends="web.check,web.compile" if="web.present">
+
+        <!-- Копируем каталог WebRoot -->
+        <copy todir="${service.assembly.web.dir}">
+            <fileset dir="${service.web.webroot.dir}">
+                <exclude name="**/*.xml" />
+                <exclude name="**/*.MF" />
+                <exclude name="**/*.mf" />
+            </fileset>
+        </copy>
+
+        <!-- Заменяем конфигурационные @{***} параметры -->
+        <copy todir="${service.assembly.web.dir}">
+            <fileset dir="${service.web.webroot.dir}">
+                <include name="**/*.xml" />
+                <include name="**/*.MF" />
+                <include name="**/*.mf" />
+            </fileset>
+            <filterset begintoken="@{" endtoken="}">
+                <filter token="web.libraries" value="${web.referenced.libraries}" />
+                <filtersfile file="${service.config.dir}/configure.properties" />
+            </filterset>
+        </copy>
+
+        <copy todir="${service.assembly.webinf.lib.dir}">
+            <fileset dir="${service.outerlib.dir}" includes="${web.included.libraries}" />
+            <fileset dir="${service.innerlib.dir}" includes="${web.included.libraries}" />
+        </copy>
+
+        <zip destfile="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war">
+            <fileset dir="${service.assembly.web.dir}" />
+        </zip>
+<!--        <antcall target="web.install" />-->
+        <antcall target="web.clean" />
+        <antcall target="ws.build" />
+    </target>
+
+    <target name="web.install">
+        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_web"
+                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="war"/>
+        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.web.dir}/pom.xml"/>
+        <antcall target="web.install.process" />
+        <antcall target="web.deploy.process" />
+    </target>
+
+    <!-- Проверяет существует ли ejb файл для деплоя -->
+    <target name="deploying.web.file.presents.check">
+        <available file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war"
+                   type="file" property="deploying.web.file.presents" />
+    </target>
+
+    <!-- Проверяет существует ли ejb pom файл для деплоя -->
+    <target name="deploying.web.pom.file.presents.check">
+        <available file="${service.assembly.web.dir}/pom.xml" type="file" property="deploying.web.pom.file.presents" />
+    </target>
+
+    <target name="set.web.deploy.ready" depends="deploying.web.file.presents.check, deploying.web.pom.file.presents.check">
+        <condition property="web.deploy.ready" value="true">
+            <and>
+                <equals arg1="${deploy.process.flag}" arg2="true"/>
+                <isset property="deploying.web.file.presents"/>
+                <isset property="deploying.web.pom.file.presents"/>
+            </and>
+        </condition>
+    </target>
+
+    <target name="web.install.process" depends="" unless="deploy.process.flag">
+        <artifact:pom id="realPom" file="${service.assembly.web.dir}/pom.xml"/>
+        <artifact:install file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war" pomRefId="realPom"/>
+    </target>
+
+    <target name="web.deploy.process" depends="set.web.deploy.ready" if="web.deploy.ready">
+        <artifact:pom id="realPom" file="${service.assembly.web.dir}/pom.xml"/>
+        <artifact:deploy
+                file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war"
+                pomRefId="realPom"
+                settingsFile="${m2.settings.xml.path}">
+            <remoteRepository url="${maven.remote.repository.url}"
+                              id="${m2.settings.xml.release.repository.id}"/>
+        </artifact:deploy>
+    </target>
+
+    <!-- Собирает WEB-сервис -->
+    <target name="ws.build" if="web.service.generate">
+
+        <move file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war" tofile="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web_portable.war" />
+
+        <mkdir dir="${common.out.dir}/wslib" />
+        <copy todir="${common.out.dir}/wslib">
+            <fileset dir="${service.outerlib.dir}" includes="${web.included.libraries}" />
+            <fileset dir="${service.outerlib.dir}" includes="${web.referenced.libraries}" />
+
+            <fileset dir="${service.innerlib.dir}" includes="${web.included.libraries}" />
+            <fileset dir="${service.innerlib.dir}" includes="${web.referenced.libraries}" />
+
+            <fileset dir="${service.assembly.dir}" includes="${web.referenced.libraries}" />
+
+            <fileset dir="${service.assembly.dir}">
+                <include name="${system.id}_${solution.id}_${service.id}_lib.jar" />
+            </fileset>
+        </copy>
+
+        <mkdir dir="${service.assembly.dir}/temp" />
+<!--        <exec executable="${ws.generate.programm}" dir="${service.assembly.dir}" failonerror="yes">-->
+<!--            <arg value="temp" />-->
+<!--            <arg value="${system.id}_${solution.id}_${service.id}_web_portable.war" />-->
+<!--            <arg value="${system.id}_${solution.id}_${service.id}_web.war" />-->
+<!--            <arg value="${common.out.dir}/wslib" />-->
+<!--        </exec>-->
+
+        <delete dir="${common.out.dir}/wslib" />
+        <delete dir="${service.assembly.dir}/temp" />
+        <delete file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web_portable.war" />
+    </target>
+
+    <!-- Собирает LIB-компонент -->
+    <target name="lib.build" depends="lib.check,lib.compile" if="lib.present">
+        <copy todir="${service.assembly.lib.dir}">
+            <fileset dir="${service.lib.src.dir}">
+                <exclude name="**/*.java" />
+                <exclude name="**/*.html" />
+            </fileset>
+        </copy>
+
+        <copy todir="${service.assembly.lib.dir}/META-INF">
+            <fileset dir="${service.lib.src.dir}/META-INF" />
+        </copy>
+
+        <zip destfile="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_lib.jar">
+            <fileset dir="${service.assembly.lib.dir}" />
+        </zip>
+<!--        <antcall target="lib.install" />-->
+        <antcall target="lib.clean" />
+    </target>
+
+    <target name="lib.install">
+        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_lib"
+                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="jar" />
+        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.lib.dir}/pom.xml"/>
+<!--        <antcall target="lib.install.process" />-->
+        <antcall target="lib.deploy.process" />
+    </target>
+
+    <!-- Проверяет существует ли lib файл для деплоя -->
+    <target name="deploying.lib.file.presents.check">
+        <available file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_lib.jar"
+                   type="file" property="deploying.lib.file.presents" />
+    </target>
+
+    <!-- Проверяет существует ли lib pom файл для деплоя -->
+    <target name="deploying.lib.pom.file.presents.check">
+        <available file="${service.assembly.lib.dir}/pom.xml" type="file" property="deploying.lib.pom.file.presents" />
+    </target>
+
+    <target name="set.lib.deploy.ready" depends="deploying.lib.file.presents.check, deploying.lib.pom.file.presents.check">
+        <condition property="lib.deploy.ready" value="true">
+            <and>
+                <equals arg1="${deploy.process.flag}" arg2="true"/>
+                <isset property="deploying.lib.file.presents"/>
+                <isset property="deploying.lib.pom.file.presents"/>
+            </and>
+        </condition>
+    </target>
+
+    <target name="lib.install.process" depends="" unless="deploy.process.flag">
+        <artifact:pom id="realPom" file="${service.assembly.lib.dir}/pom.xml"/>
+        <artifact:install file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_lib.jar" pomRefId="realPom"/>
+    </target>
+
+    <target name="lib.deploy.process" depends="set.lib.deploy.ready" if="lib.deploy.ready">
+        <artifact:pom id="realPom" file="${service.assembly.lib.dir}/pom.xml"/>
+        <artifact:deploy
+                file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_lib.jar"
+                pomRefId="realPom"
+                settingsFile="${m2.settings.xml.path}">
+            <remoteRepository url="${maven.remote.repository.url}"
+                              id="${m2.settings.xml.release.repository.id}"/>
+        </artifact:deploy>
+    </target>
+
+    <!-- Собирает EJB-компонент -->
+    <target name="ejb.build" depends="ejb.check,ejb.compile" if="ejb.present">
+
+        <copy todir="${service.assembly.ejb.dir}">
+            <fileset dir="${service.ejb.src.dir}">
+                <exclude name="**/*.java" />
+                <exclude name="**/*.html" />
+            </fileset>
+        </copy>
+
+        <copy todir="${service.assembly.ejb.dir}/META-INF" overwrite="true">
+            <fileset dir="${service.ejb.src.dir}/META-INF" />
+            <filterset begintoken="@{" endtoken="}">
+                <filter token="ejb.libraries" value="${ejb.included.libraries}" />
+                <filtersfile file="${service.config.dir}/configure.properties" />
+<!--                <filtersfile file="${service.config.dir}/hibernate.properties" />-->
+            </filterset>
+        </copy>
+
+        <zip destfile="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_ejb.jar">
+            <fileset dir="${service.assembly.ejb.dir}" />
+        </zip>
+<!--        <antcall target="ejb.install" />-->
+        <antcall target="ejb.clean" />
+    </target>
+
+    <target name="ejb.install">
+        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_ejb"
+                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="ejb" />
+        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.ejb.dir}/pom.xml"/>
+<!--        <antcall target="ejb.install.process" />-->
+        <antcall target="ejb.deploy.process" />
+    </target>
+
+
+    <!-- Проверяет существует ли ejb файл для деплоя -->
+    <target name="deploying.ejb.file.presents.check">
+        <available file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_ejb.jar"
+                   type="file" property="deploying.ejb.file.presents" />
+    </target>
+
+    <!-- Проверяет существует ли ejb pom файл для деплоя -->
+    <target name="deploying.ejb.pom.file.presents.check">
+        <available file="${service.assembly.ejb.dir}/pom.xml" type="file" property="deploying.ejb.pom.file.presents" />
+    </target>
+
+    <target name="set.ejb.deploy.ready" depends="deploying.ejb.file.presents.check, deploying.ejb.pom.file.presents.check">
+        <condition property="ejb.deploy.ready" value="true">
+            <and>
+                <equals arg1="${deploy.process.flag}" arg2="true"/>
+                <isset property="deploying.ejb.file.presents"/>
+                <isset property="deploying.ejb.pom.file.presents"/>
+            </and>
+        </condition>
+    </target>
+
+    <target name="ejb.install.process" depends="" unless="deploy.process.flag">
+        <artifact:pom id="realPom" file="${service.assembly.ejb.dir}/pom.xml"/>
+        <artifact:install file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_ejb.jar" pomRefId="realPom"/>
+    </target>
+
+    <target name="ejb.deploy.process" depends="set.ejb.deploy.ready" if="ejb.deploy.ready">
+        <artifact:pom id="realPom" file="${service.assembly.ejb.dir}/pom.xml"/>
+        <artifact:deploy
+                file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_ejb.jar"
+                pomRefId="realPom"
+                settingsFile="${m2.settings.xml.path}">
+            <remoteRepository url="${maven.remote.repository.url}"
+                              id="${m2.settings.xml.release.repository.id}"/>
+        </artifact:deploy>
+    </target>
+
+    <!-- Собирает EAR-компонент -->
+    <target name="app.build" depends="app.check,lib.build,web.build,ejb.build,app.compile" if="app.present">
+
+        <copy todir="${service.assembly.app.dir}/META-INF">
+            <fileset dir="${service.app.metainf.dir}">
+                <exclude name="**/*.java" />
+                <exclude name="**/*.html" />
+            </fileset>
+            <filterset begintoken="@{" endtoken="}">
+                <filtersfile file="${service.config.dir}/configure.properties" />
+            </filterset>
+        </copy>
+
+        <zip destfile="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}.ear">
+            <fileset dir="${service.assembly.app.dir}" />
+            <fileset dir="${service.assembly.dir}">
+                <include name="**/*.jar" />
+                <include name="**/*.war" />
+            </fileset>
+            <fileset dir="${service.outerlib.dir}" includes="${ejb.included.libraries}" />
+            <fileset dir="${service.innerlib.dir}" includes="${ejb.included.libraries}" excludes="${system.id}_${solution.id}_${service.id}_lib.jar" />
+        </zip>
+
+        <antcall target="clean" />
+    </target>
+    
+    
+
+    <target name="build" depends="app.build" />
+
+    <!-- Копирует все скомпилированные файлы услуги в общий каталог -->
+    <target name="shared" depends="build">
+        <copy todir="${build.ear.dir}">
+            <fileset dir="${service.assembly.dir}">
+                <include name="**/${system.id}_${solution.id}_${service.id}.ear" />
+            </fileset>
+        </copy>
+        <copy todir="${service.innerlib.dir}">
+            <fileset dir="${service.assembly.dir}">
+                <include name="**/${system.id}_${solution.id}_${service.id}_lib.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- Копирует ejb-архив услуги в общий каталог -->
+    <target name="ejb.shared" depends="build">
+        <copy todir="${service.innerlib.dir}">
+            <fileset dir="${service.assembly.dir}">
+                <include name="**/${system.id}_${solution.id}_${service.id}_ejb.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- Удаляет все скомпилированные файлы услуги из общего каталога -->
+    <target name="del">
+        <delete file="${build.ear.dir}/${system.id}_${solution.id}_${service.id}.ear" />
+        <delete file="${service.innerlib.dir}/${system.id}_${solution.id}_${service.id}_lib.jar" />
+    </target>
+    
+</project>
