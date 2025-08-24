@@ -1,7 +1,5 @@
 package modules.anttest.reader;
 
-import modules.anttest.reader.ejb.RandomWordGenerator;
-import modules.anttest.reader.ejb.RandomWordGeneratorHome;
 import modules.anttest.reader.ejb.RandomWordGeneratorRemote;
 
 import javax.naming.Context;
@@ -10,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {

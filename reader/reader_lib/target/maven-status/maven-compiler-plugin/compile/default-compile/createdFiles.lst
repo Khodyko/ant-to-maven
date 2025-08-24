@@ -1,0 +1,3 @@
+modules/anttest/reader/ejb/RandomWordGeneratorHome.class
+modules/anttest/reader/ejb/RandomWordGenerator.class
+modules/anttest/reader/ejb/RandomWordGeneratorRemote.class
