@@ -29,8 +29,7 @@ echo "********* ANT Clean Started **********";
 ant -f $ANT_BUILD_PATH  || fexit "MAVEN Building Error";
 echo ant_test installed;
 echo "********* DELETE ear FILES **********";
-rm -rf $SERVER_DEPLOYMENTS_FOLDER*.war
-rm -rf $SERVER_DEPLOYMENTS_FOLDER"archive"
+rm -rf $SERVER_DEPLOYMENTS_FOLDER*.ear
 echo "********* DELETE ear FILES FINISHED **********";
 echo "********* CLEAN TMP and LOG FOLDERS **********";
 rm -rf $SERVER_TMP_FOLDER*;

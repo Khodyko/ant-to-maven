@@ -199,14 +199,6 @@
         <antcall target="ws.build" />
     </target>
 
-    <target name="web.install">
-        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_web"
-                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="war"/>
-        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.web.dir}/pom.xml"/>
-        <antcall target="web.install.process" />
-        <antcall target="web.deploy.process" />
-    </target>
-
     <!-- Проверяет существует ли ejb файл для деплоя -->
     <target name="deploying.web.file.presents.check">
         <available file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_web.war"
@@ -297,14 +289,6 @@
         <antcall target="lib.clean" />
     </target>
 
-    <target name="lib.install">
-        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_lib"
-                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="jar" />
-        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.lib.dir}/pom.xml"/>
-<!--        <antcall target="lib.install.process" />-->
-        <antcall target="lib.deploy.process" />
-    </target>
-
     <!-- Проверяет существует ли lib файл для деплоя -->
     <target name="deploying.lib.file.presents.check">
         <available file="${service.assembly.dir}/${system.id}_${solution.id}_${service.id}_lib.jar"
@@ -366,14 +350,6 @@
         </zip>
 <!--        <antcall target="ejb.install" />-->
         <antcall target="ejb.clean" />
-    </target>
-
-    <target name="ejb.install">
-        <artifact:pom id="virtualPom" groupId="isida.edd" artifactId="${maven.artifact.prefix}_${solution.id}_${service.id}_ejb"
-                      version="${edd.version}" name="EDD ${solution.id} ${service.id}" packaging="ejb" />
-        <artifact:writepom pomRefId="virtualPom" file="${service.assembly.ejb.dir}/pom.xml"/>
-<!--        <antcall target="ejb.install.process" />-->
-        <antcall target="ejb.deploy.process" />
     </target>
 
 
